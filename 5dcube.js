@@ -483,6 +483,40 @@ for (penteract_faces_vertices of penteract_faces) {
 }
 
 
+// now lets make the edges (lines)
+const line_material = new THREE.LineBasicMaterial( { color: 0xaaaaaa } );
+
+var projected_lines_geometries = [];
+var projected_lines = [];
+
+for (oneline of penteract_lines) {
+
+    const points = [];
+
+    //first vertex of the line
+    var temp_pt = stereographic_project(2, penteract_vertices[oneline[0]]);
+    temp_pt[0]  *= scaler; 
+    temp_pt[1]  *= scaler; 
+    temp_pt[2]  *= scaler; 
+
+    points.push( new THREE.Vector3( temp_pt[0], temp_pt[1], temp_pt[2] ) );
+    
+    //second vertex of the line
+    temp_pt = stereographic_project(2, penteract_vertices[oneline[1]]);
+    temp_pt[0]  *= scaler; 
+    temp_pt[1]  *= scaler; 
+    temp_pt[2]  *= scaler; 
+
+    points.push( new THREE.Vector3( temp_pt[0], temp_pt[1], temp_pt[2] ) );
+    
+    const line_geometry = new THREE.BufferGeometry().setFromPoints( points );
+    projected_lines_geometries.push(line_geometry);
+    const line = new THREE.Line( line_geometry, line_material );
+    projected_lines.push(line);
+    scene.add( line );
+}
+
+
 // scene.add(projected_faces_meshes[0]);
 
 // projected_faces_meshes[0].position.z = 0;
@@ -497,10 +531,13 @@ function animate() {
     requestAnimationFrame( animate );
 
 
-    for (g of projected_faces_meshes) {
-        g.rotation.y -=0.005;
+    for (f of projected_faces_meshes) {
+        f.rotation.y -=0.005;
     }
 
+    for (l of projected_lines) {
+        l.rotation.y -=0.005;
+    }
 
 
     renderer.render( scene, camera );
